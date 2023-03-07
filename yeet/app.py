@@ -1,56 +1,39 @@
-from http.server import BaseHTTPRequestHandler, HTTPServer
-from typing import Any, Callable
+from http.server import HTTPServer
+
+from abc import ABC
+from http.server import BaseHTTPRequestHandler
+import re
+
+from yeet.templating import render_template
 
 
-class BaseRequestHandler(BaseHTTPRequestHandler):
-    """
-    Handle HTTP requests by returning a fixed 'page'
-    Args:
-        BaseHTTPRequestHandler (_type_): _description_
-    """
-
-    PAGE = '''\
-<html>
-<body>
-<table>
-<tr>  <td>Header</td>         <td>Value</td>          </tr>
-<tr>  <td>Date and time</td>  <td>{date_time}</td>    </tr>
-<tr>  <td>Client host</td>    <td>{client_host}</td>  </tr>
-<tr>  <td>Client port</td>    <td>{client_port}s</td> </tr>
-<tr>  <td>Command</td>        <td>{command}</td>      </tr>
-<tr>  <td>Path</td>           <td>{path}</td>         </tr>
-</table>
-</body>
-</html>
-'''
-
-    @staticmethod
-    def to_bytes(value):
-        return bytes(value, encoding='utf-8')
+class HTTPRequestHandler(BaseHTTPRequestHandler, ABC):
+    app = None
 
     def do_GET(self):
-        page = self.create_page()
-        self.send_page(page)
+        # fixme: routes order
+        for route, controller in HTTPRequestHandler.app.url_map.items():
+            self.path = self.path.lstrip('/')
+            matches = re.match(route, self.path)
+            if matches:
+                if hasattr(controller, '__call__'):
+                    self._send(controller().render(self.request, self.path), code=200)
+                else:
+                    self._send(controller.render(self.request, self.path), code=200)
+                break
+        else:
+            self._send(render_template('404.html'), code=404)
 
-    def create_page(self):
-        values = {
-            "date_time": self.date_time_string(),
-            "client_host": self.client_address[0],
-            "client_port": self.client_address[1],
-            "command": self.command,
-            "path": self.path
-        }
-
-        page = self.PAGE.format(**values)
-
-        return page
-
-    def send_page(self, page):
-        self.send_response(200)
+    def _send(self, page, code=200):
+        self.send_response(code)
         self.send_header("Content-type", "text/html")
         self.send_header("Content-Length", str(len(page)))
         self.end_headers()
-        self.wfile.write(self.to_bytes(page))
+        self.wfile.write(self._to_bytes(page))
+
+    @staticmethod
+    def _to_bytes(value):
+        return bytes(value, encoding='utf-8')
 
 
 class Yeet:
@@ -58,37 +41,26 @@ class Yeet:
 
     def __init__(self, name: str = 'app') -> None:
         self.name = name
+        self.url_map = {}
 
     def run(self, host: str = '', port: int = 8080) -> None:
-        server = HTTPServer((host, port), BaseRequestHandler)
+        if host == '':
+            host = 'localhost'
+
+        print(f"Starting {self.name} on {host}:{port}")
+        server = HTTPServer((host, port), HTTPRequestHandler)
+        print(f"Server has been started!")
         server.serve_forever()
 
-    def route(self, rule: str, **options: Any) -> Callable:
-        """Decorate a view function to register it with the given URL
-        rule and options. Calls :meth:`add_url_rule`, which has more
-        details about the implementation.
-        .. code-block:: python
-            @app.route("/")
-            def index():
-                return "Hello, World!"
-        See :ref:`url-route-registrations`.
-        The endpoint name for the route defaults to the name of the view
-        function if the ``endpoint`` parameter isn't passed.
-        The ``methods`` parameter defaults to ``["GET"]``. ``HEAD`` and
-        ``OPTIONS`` are added automatically.
-        :param rule: The URL rule string.
-        :param options: Extra options passed to the
-            :class:`~werkzeug.routing.Rule` object.
-        """
+    def add_route(self, path, controller):
+        if path not in self.url_map:
+            self.url_map[path] = controller
+        else:
+            raise ValueError(f"Route {path} already added!")
 
-        def decorator(f: str) -> str:
-            endpoint = options.pop("endpoint", None)
-            self.add_url_rule(rule, endpoint, f, **options)
-            return f
-
-        return decorator
-
-    def __new__(cls, *args, **kwargs):
+    def __new__(cls):
         if not isinstance(cls._instance, cls):
-            cls._instance = object.__new__(cls, *args, **kwargs)
+            cls._instance = object.__new__(cls)
+
+        HTTPRequestHandler.app = cls._instance
         return cls._instance

@@ -1,13 +1,10 @@
+from examples.controllers import HomeController, ProfileController
 from yeet.app import Yeet
-from yeet.templating import render_template
 
 app = Yeet()
 
-
-@app.route('/')
-def home():
-    return render_template('base.html')
-
+app.add_route('^home/(.*)$', HomeController())
+app.add_route('^home/profile(.*)$', ProfileController())
 
 if __name__ == '__main__':
     app.run(host='', port=8080)
