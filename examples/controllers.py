@@ -1,4 +1,4 @@
-from pyhton_yeet.controllers import BaseController
+from python_yeet.controllers import BaseController
 
 
 class HomeController(BaseController):
