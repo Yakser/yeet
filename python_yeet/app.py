@@ -8,7 +8,7 @@ from python_yeet.handlers import HTTPRequestHandler
 class Yeet:
     _instance = None
 
-    def __init__(self, name: str = 'examples') -> None:
+    def __init__(self, name: str) -> None:
         self.name = name
         self.url_map = {}
 
@@ -37,7 +37,7 @@ class Yeet:
         else:
             raise ValueError(f"Route {path} already added!")
 
-    def __new__(cls):
+    def __new__(cls, name):
         if not isinstance(cls._instance, cls):
             cls._instance = object.__new__(cls)
 
