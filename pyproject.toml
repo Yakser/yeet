@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "yeet"
+name = "python_yeet"
 version = "0.1.0"
 description = "yeet is a simple Python framework"
 authors = ["Yakser <iaksanov2044@mail.ru>"]

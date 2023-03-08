@@ -1,5 +1,5 @@
 from examples.controllers import HomeController, ProfileController
-from yeet.app import Yeet
+from pyhton_yeet.app import Yeet
 
 app = Yeet()
 

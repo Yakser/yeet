@@ -1,10 +1,8 @@
-import re
-from abc import ABC
 from http.server import HTTPServer
 
 from jinja2 import Environment, PackageLoader, select_autoescape
 
-from yeet.handlers import HTTPRequestHandler
+from python_yeet.handlers import HTTPRequestHandler
 
 
 class Yeet:
