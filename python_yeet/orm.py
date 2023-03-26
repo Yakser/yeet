@@ -169,11 +169,11 @@ class BaseModel(metaclass=MetaModel):
         for field_name, value in row_data.items():
             setattr(self, field_name, value)
 
-    def save(self):
-        if self.id is None:
-            self.objects.create()
-        else:
-            self.objects.update()
+    # def save(self):
+    #     if self.id is None:
+    #         self.objects.create()
+    #     else:
+    #         self.objects.update()
 
     def __repr__(self):
         formatted_attrs = ", ".join([f"{field}={value}" for field, value in self.__dict__.items()])

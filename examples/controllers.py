@@ -1,6 +1,5 @@
 from examples.models.article import Article
 from python_yeet.controllers import BaseController
-from urllib.parse import parse_qs
 
 
 class HomeController(BaseController):
@@ -9,20 +8,18 @@ class HomeController(BaseController):
 
 
 class ArticlesController(BaseController):
-    def _get_articles(self):
+    @staticmethod
+    def _get_articles():
         articles = Article.objects.select("id", "title")
         return articles
-
-    def post(self, path):
-        article = Article.objects.create(title="New article", text="new newn ewnewnwe", author=1)
-        return str(article)
 
     def get(self, path):
         return self.render_template('articles.html', articles=self._get_articles())
 
 
 class ArticleDetailController(BaseController):
-    def _get_article(self, id):
+    @staticmethod
+    def _get_article(id):
         return Article.objects.get(id)
 
     def get(self, path, id):
@@ -30,7 +27,8 @@ class ArticleDetailController(BaseController):
 
 
 class ArticleDeleteController(BaseController):
-    def _get_article(self, id):
+    @staticmethod
+    def _get_article(id):
         return Article.objects.get(id)
 
     def post(self, path, id):
@@ -42,10 +40,12 @@ class ArticleDeleteController(BaseController):
 
 
 class ArticleEditController(BaseController):
-    def _get_article(self, id):
+    @staticmethod
+    def _get_article(id):
         return Article.objects.get(id)
 
-    def _update_article(self, id, data):
+    @staticmethod
+    def _update_article(id, data):
         Article.objects.update(id, data)
 
     def post(self, path, id, data):
