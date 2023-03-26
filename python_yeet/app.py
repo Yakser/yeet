@@ -24,15 +24,11 @@ class Yeet:
         server.serve_forever()
 
     def add_route(self, path, controller):
-        if path not in self.url_map:
-            if hasattr(controller, '__call__'):
-                controller = controller(jinja_env=self.jinja_env)
-            else:
-                controller = controller.__class__(jinja_env=self.jinja_env)
-            self.url_map[path] = controller
-
+        if hasattr(controller, '__call__'):
+            controller = controller(jinja_env=self.jinja_env)
         else:
-            raise ValueError(f"Route {path} already added!")
+            controller.jinja_env = self.jinja_env
+        self.url_map[path] = controller
 
     def __new__(cls, name):
         if not isinstance(cls._instance, cls):

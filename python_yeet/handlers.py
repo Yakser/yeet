@@ -7,13 +7,24 @@ class HTTPRequestHandler(BaseHTTPRequestHandler, ABC):
     app = None
 
     def do_GET(self):
-        # fixme: routes order
+        self._process_request('GET')
+
+    def do_POST(self):
+        self._process_request('POST')
+
+    def do_PUT(self):
+        self._process_request('PUT')
+
+    def _process_request(self, method):
         for route, controller in HTTPRequestHandler.app.url_map.items():
-            self.path = self.path.lstrip('/')
-            matches = re.fullmatch(re.compile(route), self.path)
-            if matches:
-                self._send(controller.render(self.request, self.path, *matches.groups()), code=200)
-                break
+            print(method, controller.methods)
+            if method in controller.methods:
+                self.path = self.path.lstrip('/')
+                matches = re.fullmatch(re.compile(route), self.path)
+                if matches:
+                    rendered_page = controller.render(self.request, self.path, *matches.groups())
+                    self._send(rendered_page, code=200)
+                    break
         else:
             self._send('', code=404)
 

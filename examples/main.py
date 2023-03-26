@@ -8,8 +8,8 @@ from python_yeet.db import Database
 if __name__ == '__main__':
     app = Yeet(name=os.path.basename(os.getcwd()))
 
-    app.add_route(r'^articles/(\d+)/$', ArticleDetailController)
-    app.add_route(r'^articles/$', ArticlesController)
+    app.add_route(r'^articles/(\d+)/$', ArticleDetailController(methods=['GET', 'PUT']))
+    app.add_route(r'^articles/$', ArticlesController(methods=['GET', 'POST']))
     app.add_route(r'^.*$', HomeController)
 
     db = Database(db_settings=DB_SETTINGS,

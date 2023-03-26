@@ -2,9 +2,13 @@ from abc import ABC, abstractmethod
 
 
 class BaseController(ABC):
-    def __init__(self, jinja_env=None):
+    def __init__(self, methods=None, jinja_env=None):
         super().__init__()
         self.jinja_env = jinja_env
+        if methods is None:
+            self.methods = ['GET']
+        else:
+            self.methods = methods.copy()
 
     @abstractmethod
     def render(self, request, path):

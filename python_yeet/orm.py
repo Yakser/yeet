@@ -45,15 +45,24 @@ class BaseManager:
             id:
             *field_names: a list of fields to be returned
         """
-        id = int(id)
-        if "id" not in field_names:
-            model_objects = self.select(*field_names, "id")
-        else:
-            model_objects = self.select(*field_names)
 
-        for obj in model_objects:
-            if obj.id == id:
-                return obj
+        formatted_fields = ', '.join(field_names)
+
+        if not field_names:
+            raise ValueError("Specify the fields to be returned.")
+
+        id = int(id)
+        query = f"SELECT {formatted_fields}" \
+                f" FROM {self.model_class.table_name}" \
+                f" WHERE id={id}"
+
+        cursor = self._get_cursor()
+        cursor.execute(query)
+
+        row_values = cursor.fetchone()
+        if row_values:
+            row_data = dict(zip(field_names, row_values))
+            return self.model_class(**row_data)
 
     def bulk_insert(self, rows: list):
         field_names = rows[0].keys()
