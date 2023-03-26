@@ -39,11 +39,11 @@ class BaseManager:
 
     def get(self, id, *field_names):
         """
-        Returns an object with the given id
+        Returns a model object with the given id
 
         Args:
             id:
-            *field_names: a list of selected fields
+            *field_names: a list of fields to be returned
         """
         id = int(id)
         if "id" not in field_names:

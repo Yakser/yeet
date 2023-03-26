@@ -20,10 +20,12 @@ class HTTPRequestHandler(BaseHTTPRequestHandler, ABC):
     def _send(self, page, code=200):
         self.send_response(code)
         self.send_header("Content-type", "text/html")
+
+        page = self._to_bytes(page)
         self.send_header("Content-Length", str(len(page)))
         self.end_headers()
-        self.wfile.write(self._to_bytes(page))
+        self.wfile.write(page)
 
     @staticmethod
     def _to_bytes(value):
-        return bytes(value, encoding='utf-8')
+        return value.encode("utf-8")

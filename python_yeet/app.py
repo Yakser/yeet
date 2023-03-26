@@ -14,7 +14,7 @@ class Yeet:
 
         self.jinja_env = Environment(
             loader=PackageLoader(self.name, 'templates'),
-            autoescape=select_autoescape(['html', 'xml'])
+            autoescape=select_autoescape(['html']),
         )
 
     def run(self, host: str = 'localhost', port: int = 8080) -> None:
