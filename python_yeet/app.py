@@ -17,13 +17,10 @@ class Yeet:
             autoescape=select_autoescape(['html', 'xml'])
         )
 
-    def run(self, host: str = '', port: int = 8080) -> None:
-        if host == '':
-            host = 'localhost'
-
-        print(f"Starting {self.name} on {host}:{port}")
+    def run(self, host: str = 'localhost', port: int = 8080) -> None:
+        print(f"Starting {self.name} app...")
         server = HTTPServer((host, port), HTTPRequestHandler)
-        print(f"Server has been started!")
+        print(f"Server has been started on http://{host}:{port}")
         server.serve_forever()
 
     def add_route(self, path, controller):

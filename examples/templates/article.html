@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h2>Статья {{ article.title }}</h2>
+    <p>
+        {{ article.text}}
+    </p>
+    <a href="/articles/">
+        Назад к статьям
+    </a>
+{% endblock %}

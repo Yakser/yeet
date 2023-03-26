@@ -10,9 +10,9 @@ class HTTPRequestHandler(BaseHTTPRequestHandler, ABC):
         # fixme: routes order
         for route, controller in HTTPRequestHandler.app.url_map.items():
             self.path = self.path.lstrip('/')
-            matches = re.match(route, self.path)
+            matches = re.fullmatch(re.compile(route), self.path)
             if matches:
-                self._send(controller.render(self.request, self.path), code=200)
+                self._send(controller.render(self.request, self.path, *matches.groups()), code=200)
                 break
         else:
             self._send('', code=404)

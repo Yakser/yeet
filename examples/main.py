@@ -1,12 +1,18 @@
 import os
 
-from controllers import HomeController, ProfileController
+from controllers import HomeController, ArticlesController, ArticleDetailController
+from examples.constants import INIT_QUERIES, DB_SETTINGS
 from python_yeet.app import Yeet
+from python_yeet.db import Database
 
 if __name__ == '__main__':
     app = Yeet(name=os.path.basename(os.getcwd()))
 
-    app.add_route('^home/profile(.*)$', ProfileController)
-    app.add_route('^home/(.*)$', HomeController)
+    app.add_route(r'^articles/(\d+)/$', ArticleDetailController)
+    app.add_route(r'^articles/$', ArticlesController)
+    app.add_route(r'^.*$', HomeController)
 
-    app.run(host='', port=8080)
+    db = Database(db_settings=DB_SETTINGS,
+                  init_queries=INIT_QUERIES)
+
+    app.run()
