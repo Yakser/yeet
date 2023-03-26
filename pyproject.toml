@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "python_yeet"
-version = "0.0.0"
+version = "1.0.1"
 description = "yeet is a simple Python framework"
 authors = ["Yakser <iaksanov2044@mail.ru>"]
 readme = "README.md"
