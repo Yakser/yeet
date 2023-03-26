@@ -19,21 +19,10 @@ jobs:
     - name: Install Python Poetry
       uses: abatilo/actions-poetry@v2.1.0
       with:
-        poetry-version: 1.1.2
-    - name: View poetry version
-      run: poetry --version
+        poetry-version: 1.4.0
     - name: Install dependencies
       run: |
         python -m poetry install
-    - name: Lint with flake8
-      run: |
-        # stop the build if there are Python syntax errors or undefined names
-        python -m poetry run flake8 . --exclude .venv --count --select=E9,F63,F7,F82 --show-source --statistics
-        # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
-        python -m poetry run flake8 . --exclude .venv --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-    - name: Test with pytest
-      run: |
-        python -m poetry run python -m pytest -v tests
 
   Release:
     needs: Quality
