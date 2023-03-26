@@ -5,14 +5,32 @@ from pymysql import connect
 class BaseManager:
     connection: None | pymysql.Connection = None
 
-    def __init__(self, model_class):
+    def __init__(self, model_class: "BaseModel"):
         self.model_class = model_class
+        assert '__annotations__' in model_class.__dict__, "You must annotate all model fields!"
+
+    def create(self, **fields):
+        obj = self.model_class()
+        for field, value in fields.items():
+            if field != 'id':
+                setattr(obj, field, value)
+
+        assert fields, "You must to specify model fields!"
+
+        formatted_fields = ', '.join(fields.keys())
+        # looks like "(%s, %s), (%s, %s), ..."
+        values_placeholder_format = ", ".join([f'({", ".join(["%s"] * len(fields))})'])
+        query = f"INSERT INTO {self.model_class.table_name} ({formatted_fields})" \
+                f" VALUES {values_placeholder_format}"
+
+        self._execute(query, list(fields.values()))
+        return obj
 
     def select(self, *field_names, chunk_size=2000):
-        formatted_fields = ', '.join(field_names)
-
-        if not field_names:
-            raise ValueError("Specify the fields to be returned.")
+        if field_names:
+            formatted_fields = ', '.join(field_names)
+        else:
+            formatted_fields = ', '.join(self.model_class.__dict__['__annotations__'])
 
         query = f"SELECT {formatted_fields} FROM {self.model_class.table_name}"
 
@@ -46,10 +64,10 @@ class BaseManager:
             *field_names: a list of fields to be returned
         """
 
-        formatted_fields = ', '.join(field_names)
-
         if not field_names:
-            raise ValueError("Specify the fields to be returned.")
+            field_names = self.model_class.__dict__['__annotations__']
+
+        formatted_fields = ', '.join(field_names)
 
         id = int(id)
         query = f"SELECT {formatted_fields}" \
@@ -58,7 +76,6 @@ class BaseManager:
 
         cursor = self._get_cursor()
         cursor.execute(query)
-
         row_values = cursor.fetchone()
         if row_values:
             row_data = dict(zip(field_names, row_values))
@@ -84,7 +101,18 @@ class BaseManager:
 
         self._execute(query, params)
 
-    def update(self, new_data: dict):
+    def update(self, id, new_data: dict):
+        field_names = new_data.keys()
+
+        # looks like "field_name=%s, another_field_name=%s, ..."
+        placeholder_format = ', '.join([f"{field_name} = %s" for field_name in field_names])
+
+        query = f"UPDATE {self.model_class.table_name} SET {placeholder_format} WHERE id={id}"
+        params = list(new_data.values())
+
+        self._execute(query, params)
+
+    def update_all(self, new_data: dict):
         field_names = new_data.keys()
 
         # looks like "field_name=%s, another_field_name=%s, ..."
@@ -95,8 +123,11 @@ class BaseManager:
 
         self._execute(query, params)
 
-    def delete(self, where):
-        raise NotImplementedError
+    def delete(self, id):
+        query = f"DELETE FROM {self.model_class.table_name} WHERE id={id}"
+        article = self.get(id)
+        self._execute(query)
+        return article
 
     def delete_all(self):
         query = f"DELETE FROM {self.model_class.table_name}"
@@ -111,6 +142,7 @@ class BaseManager:
     @classmethod
     def _execute(cls, query, params=None):
         cursor = cls._get_cursor()
+
         cursor.execute(query=query, args=params)
 
     @classmethod
@@ -131,10 +163,17 @@ class MetaModel(type):
 
 class BaseModel(metaclass=MetaModel):
     table_name = ""
+    objects: BaseManager
 
     def __init__(self, **row_data):
         for field_name, value in row_data.items():
             setattr(self, field_name, value)
+
+    def save(self):
+        if self.id is None:
+            self.objects.create()
+        else:
+            self.objects.update()
 
     def __repr__(self):
         formatted_attrs = ", ".join([f"{field}={value}" for field, value in self.__dict__.items()])

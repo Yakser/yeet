@@ -6,6 +6,17 @@
         <p>
             {{ article.text }}
         </p>
+
+        <h3>Редактировать</h3>
+        <form action="/articles/{{ article.id }}/edit/" method="post">
+            <input type="text" name="title">
+            <input type="text" name="text">
+            <button type="submit">Изменить</button>
+        </form>
+
+        <form action="/articles/{{ article.id }}/delete/" method="post">
+            <button type="submit">Удалить</button>
+        </form>
     {% else %}
         <h2>Такой статьи не найдено!</h2>
         <p>Посмотрите остальные статьи</p>
@@ -13,4 +24,6 @@
     <a href="/articles/">
         Назад к статьям
     </a>
+
+
 {% endblock %}

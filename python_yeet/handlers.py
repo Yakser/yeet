@@ -1,6 +1,9 @@
 import re
 from abc import ABC
 from http.server import BaseHTTPRequestHandler
+from urllib.parse import parse_qs
+
+from python_yeet.helpers import clean_method, clean_data
 
 
 class HTTPRequestHandler(BaseHTTPRequestHandler, ABC):
@@ -16,14 +19,20 @@ class HTTPRequestHandler(BaseHTTPRequestHandler, ABC):
         self._process_request('PUT')
 
     def _process_request(self, method):
+        method = clean_method(method)
         for route, controller in HTTPRequestHandler.app.url_map.items():
-            print(method, controller.methods)
             if method in controller.methods:
                 self.path = self.path.lstrip('/')
                 matches = re.fullmatch(re.compile(route), self.path)
                 if matches:
-                    rendered_page = controller.render(self.request, self.path, *matches.groups())
-                    self._send(rendered_page, code=200)
+                    if method == 'post':
+                        content_length = int(self.headers['Content-Length'])
+                        data = self.rfile.read(content_length)
+                        data = parse_qs(data.decode("utf-8"), keep_blank_values=True)
+                        response = controller.post(self.path, *matches.groups(), clean_data(data))
+                    else:
+                        response = getattr(controller, method)(self.path, *matches.groups())
+                    self._send(response, code=200)
                     break
         else:
             self._send('', code=404)

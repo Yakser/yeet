@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    {% if article %}
+        <h2>Статья {{ article.title }} успешно изменена!</h2>
+    {% else %}
+        <h2>Такой статьи не найдено!</h2>
+        <p>Посмотрите остальные статьи</p>
+    {% endif %}
+    <a href="/articles/">
+        Назад к статьям
+    </a>
+{% endblock %}
