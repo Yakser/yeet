@@ -1,11 +1,12 @@
-name: CI
-on:
-  push:
-    branches: [ master ]
-  pull_request:
-    branches: [ master ]
-
-jobs:
+# fixme need to provide credentials
+#name: CI
+#on:
+#  push:
+#    branches: [ master ]
+#  pull_request:
+#    branches: [ master ]
+#
+#jobs:
 #  Quality:
 #    runs-on: ubuntu-latest
 #    steps:
@@ -30,22 +31,22 @@ jobs:
 #      run: |
 #        python -m poetry run python -m pytest -v tests
 
-  Release:
+#  Release:
 #    needs: Quality
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-python@v2
-        with:
-          python-version: 3.9
-      - name: Install Python Poetry
-        uses: abatilo/actions-poetry@v2.1.0
-        with:
-          poetry-version: 1.4.0
-      - name: Install dependencies
-        run: |
-          python -m poetry install
-      - name: Release to PyPI
-        run: |
-          poetry build
-          poetry publish
+#    runs-on: ubuntu-latest
+#    steps:
+#      - uses: actions/checkout@v2
+#      - uses: actions/setup-python@v2
+#        with:
+#          python-version: 3.9
+#      - name: Install Python Poetry
+#        uses: abatilo/actions-poetry@v2.1.0
+#        with:
+#          poetry-version: 1.4.0
+#      - name: Install dependencies
+#        run: |
+#          python -m poetry install
+#      - name: Release to PyPI
+#        run: |
+#          poetry build
+#          poetry publish
