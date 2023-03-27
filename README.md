@@ -1,4 +1,5 @@
 # yeet
+# [what is a yeet?](https://www.youtube.com/watch?v=fVva0bV0odg)
 
 # quickstart
 
