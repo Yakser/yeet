@@ -44,11 +44,12 @@ from python_yeet.controllers import BaseController
 
 
 class ArticlesController(BaseController):
+    def get(self, path):
+        return self.render_template('articles.html', articles=self._get_articles())
+        
+   
     @staticmethod
     def _get_articles():
         articles = Article.objects.select("id", "title")
         return articles
-
-    def get(self, path):
-        return self.render_template('articles.html', articles=self._get_articles())
 ```
