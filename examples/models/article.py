@@ -1,11 +1,10 @@
 import datetime
 
-from python_yeet.orm import BaseModel, BaseManager
+from python_yeet.orm import BaseModel
 
 
 class Article(BaseModel):
     table_name = "articles"
-    manager_class = BaseManager
 
     id: int
     title: str

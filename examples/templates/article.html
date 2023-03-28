@@ -8,14 +8,21 @@
         </p>
 
         <h3>Редактировать</h3>
+
         <form action="/articles/{{ article.id }}/edit/" method="post">
-            <input type="text" name="title">
-            <input type="text" name="text">
-            <button type="submit">Изменить</button>
+            <div class="mb-3">
+                <label for="title" class="form-label">Заголовок</label>
+                <input type="text" id="title" name="title" class="form-control" id="title" aria-describedby="Заголовок">
+            </div>
+            <div class="mb-3">
+                <label for="text" class="form-label">Текст</label>
+                <input type="text" class="form-control" id="text">
+            </div>
+            <button type="submit" class="btn btn-primary">Изменить</button>
         </form>
 
         <form action="/articles/{{ article.id }}/delete/" method="post">
-            <button type="submit">Удалить</button>
+            <button type="submit" class="btn btn-danger mt-2">Удалить</button>
         </form>
     {% else %}
         <h2>Такой статьи не найдено!</h2>
